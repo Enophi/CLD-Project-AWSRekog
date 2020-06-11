@@ -1,0 +1,22 @@
+.nav {
+    margin: 10px;
+}
+
+.results {
+    display: flex;
+    align-items: center;
+}
+
+.item {
+    flex-grow: 1;
+    align-self: flex-start;
+}
+
+.item-2 {
+    flex-grow: 2;
+    align-self: flex-start;
+}
+
+.json {
+    text-align: left;
+}
