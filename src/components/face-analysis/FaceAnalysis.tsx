@@ -1,7 +1,10 @@
 import React from 'react';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
+import { faUsers } from '@fortawesome/free-solid-svg-icons'
 
 interface Props {
     imageData?: string,
+    showAnimation: () => void,
     onProcessed: (infos: any) => void,
     rekog: AWS.Rekognition
 }
@@ -9,6 +12,7 @@ interface Props {
 class FaceAnalysis extends React.Component<Props, any> {
 
     processImage = () => {
+        this.props.showAnimation()
         let image = atob(this.props.imageData!.split('data:image/png;base64,')[1])
         let bytes = new Uint8Array(new ArrayBuffer(image.length))
         for (var i = 0; i < image.length; i++) {
@@ -30,7 +34,10 @@ class FaceAnalysis extends React.Component<Props, any> {
     };
 
     render() {
-        return <button className="action-button nav" onClick={this.processImage}>Face Analysis</button>
+        return <div>
+            <FontAwesomeIcon icon={faUsers} size='3x' className='icons-base-color' onClick={this.processImage}/>
+            <p>Face</p>
+            </div>
     }
 }
 
