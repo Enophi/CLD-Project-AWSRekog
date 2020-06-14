@@ -102,6 +102,7 @@ class CanvasComp extends React.Component<any, State> {
                 td.Geometry.BoundingBox.Top,
                 td.Geometry.BoundingBox.Width,
                 td.Geometry.BoundingBox.Height,
+                '#e67e22'
             )
         }
     }
@@ -135,9 +136,19 @@ class CanvasComp extends React.Component<any, State> {
 
     onCustomProcessed(infos: any) {
         this.setState({
+            rawData: infos,
             isLoading: false
         });
-        console.log(infos);
+        for (let c of infos.CustomLabels) {
+            this.drawTag(
+                `${c.Name}\n${c.Confidence.toFixed(2)}%`,
+                c.Geometry.BoundingBox.Left,
+                c.Geometry.BoundingBox.Top,
+                c.Geometry.BoundingBox.Width,
+                c.Geometry.BoundingBox.Height,
+                '#8e44ad'
+            );
+        }
     }
 
     drawMark(label: string, x: number, y: number, color: string = '#0000FF') {
