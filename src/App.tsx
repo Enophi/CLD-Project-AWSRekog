@@ -6,7 +6,6 @@ function App() {
 
   return (
     <div className="App">
-      <h1>AWS Rekognition POC</h1>
       <Features></Features>
     </div>
   );

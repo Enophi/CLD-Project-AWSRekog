@@ -4,6 +4,7 @@ import ImageUploader from 'react-images-upload';
 
 import './Features.css';
 import CanvasComp from '../canvas/CanvasComp';
+import logo from '../../img/aws-rekognition.png'
 
 interface State {
     image?: HTMLImageElement,
@@ -48,23 +49,34 @@ class Features extends React.Component<any, State> {
 
     render() {
         return (
-            <div>
-                <div className="container">
+            <div className="body-content">
+                <div className="d-flex flex-row justify-content-between" style={{margin:10}}>
+                    <div className="col-3">
+                        <img src={logo} alt="Logo" />
+                    </div>
+
                     <ImageUploader
-                        withIcon={false}
+                        withIcon={true}
                         buttonText='Sélectionnez une image'
+                        buttonClassName="image-upload"
+                        buttonStyles={{ backgroundColor: "#429ef5" }}
                         onChange={this.onDrop}
-                        imgExtension={['.jpg|.png']}
+                        imgExtension={['.jpg', '.png']}
+                        label="La taille maximale de l'image 5Mb, extensions acceptés .jpg, .png"
                         singleImage={true}
                         maxFileSize={5242880}
                     />
-                    <div className="item">
-                        <CanvasComp
-                            imageURL={this.state.imageURL}
-                            w={this.state.image?.width}
-                            h={this.state.image?.height}
-                            rekog={this.state.rekog} />
+                    <div className="col-3">
+
                     </div>
+                </div>
+
+                <div>
+                    <CanvasComp
+                        imageURL={this.state.imageURL}
+                        w={this.state.image?.width}
+                        h={this.state.image?.height}
+                        rekog={this.state.rekog} />
                 </div>
             </div>
         )

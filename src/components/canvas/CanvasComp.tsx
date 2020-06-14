@@ -1,8 +1,12 @@
 import React, { createRef } from 'react';
-import FaceAnalysis from '../face-analysis/FaceAnalysis'
+import ReactLoading from 'react-loading';
+
 import ImageAnalysis from '../image-analysis/ImageAnalysis'
+import FaceAnalysis from '../face-analysis/FaceAnalysis'
+import TextAnalysis from '../text-analysis/TextAnalysis'
 import CustomAnalysis from '../custom-analysis/CustomAnalysis'
 import ReactJson from 'react-json-view'
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 import './CanvasComp.css';
 
@@ -12,22 +16,26 @@ interface State {
     rekog: AWS.Rekognition,
     imageData?: string,
     rawData?: any
+    isLoading: boolean
 }
 
 class CanvasComp extends React.Component<any, State> {
     canvasRef: React.RefObject<HTMLCanvasElement>;
-    
+
     constructor(props: any) {
         super(props)
         this.state = {
             w: 0,
             h: 0,
-            rekog: this.props.rekog
+            rekog: this.props.rekog,
+            isLoading: false
         }
 
         this.canvasRef = createRef()
+        this.showAnimation = this.showAnimation.bind(this);
         this.updateImage = this.updateImage.bind(this);
         this.onImageProcessed = this.onImageProcessed.bind(this)
+        this.onTextProcessed = this.onTextProcessed.bind(this)
         this.onFaceProcessed = this.onFaceProcessed.bind(this)
         this.onCustomProcessed = this.onCustomProcessed.bind(this)
     }
@@ -35,9 +43,15 @@ class CanvasComp extends React.Component<any, State> {
     componentWillReceiveProps(someProps: any) {
         this.setState({
             w: someProps.w,
-            h: someProps.h
+            h: someProps.h,
         });
         this.updateImage(someProps.imageURL)
+    }
+
+    showAnimation(){
+        this.setState({
+            isLoading: true
+        });
     }
 
     updateImage(imageURL: string) {
@@ -59,7 +73,8 @@ class CanvasComp extends React.Component<any, State> {
 
     onImageProcessed(infos: any) {
         this.setState({
-            rawData: infos
+            rawData: infos,
+            isLoading: false
         });
         for (let lab of infos.Labels) {
             for (let bb of lab.Instances) {
@@ -75,9 +90,26 @@ class CanvasComp extends React.Component<any, State> {
         }
     }
 
+    onTextProcessed(infos: any) {
+        this.setState({
+            rawData: infos,
+            isLoading: false
+        });
+        for (let td of infos.TextDetections) {
+            this.drawTag(
+                td.Type,
+                td.Geometry.BoundingBox.Left,
+                td.Geometry.BoundingBox.Top,
+                td.Geometry.BoundingBox.Width,
+                td.Geometry.BoundingBox.Height,
+            )
+        }
+    }
+
     onFaceProcessed(infos: any) {
         this.setState({
-            rawData: infos
+            rawData: infos,
+            isLoading: false
         });
         for (let face of infos.FaceDetails) {
 
@@ -102,6 +134,9 @@ class CanvasComp extends React.Component<any, State> {
     }
 
     onCustomProcessed(infos: any) {
+        this.setState({
+            isLoading: false
+        });
         console.log(infos);
     }
 
@@ -132,37 +167,51 @@ class CanvasComp extends React.Component<any, State> {
 
     render() {
         return (
-            <div>
-                <div className="buttons">
-                    <FaceAnalysis
-                        imageData={this.state.imageData}
-                        onProcessed={this.onFaceProcessed}
-                        rekog={this.state.rekog}
-                    />
+            <div className="d-flex flex-row col-12">
+
+                <div className="json col-4">
+                    {this.state.isLoading ? (
+                        <div className="d-flex justify-content-center">
+                            <ReactLoading type={"bars"} color={"grey"} />
+                        </div>
+                    ) : (
+                            <ReactJson src={this.state.rawData} theme="bright:inverted" enableClipboard={false} />
+                        )
+                    }
+                </div>
+                <div className="col-7">
+                    <canvas ref={this.canvasRef} width={this.state.w} height={this.state.h}></canvas>
+                </div>
+
+                <div className="col-1 text-center">
                     <ImageAnalysis
                         imageData={this.state.imageData}
+                        showAnimation={this.showAnimation}
                         onProcessed={this.onImageProcessed}
+                        rekog={this.state.rekog}
+                    />
+                    <TextAnalysis
+                        imageData={this.state.imageData}
+                        showAnimation={this.showAnimation}
+                        onProcessed={this.onTextProcessed}
+                        rekog={this.state.rekog}
+                    />
+                    <FaceAnalysis
+                        imageData={this.state.imageData}
+                        showAnimation={this.showAnimation}
+                        onProcessed={this.onFaceProcessed}
                         rekog={this.state.rekog}
                     />
                     <CustomAnalysis
                         imageData={this.state.imageData}
+                        showAnimation={this.showAnimation}
                         onProcessed={this.onCustomProcessed}
                         rekog={this.state.rekog}
                     />
                 </div>
-                <div className="results">
-                    <div className="item json">
-                        <ReactJson src={this.state.rawData} theme="monokai" enableClipboard={false} />
-                    </div>
-                    <div className='item-2'>
-                        <canvas ref={this.canvasRef} width={this.state.w} height={this.state.h}></canvas>
-                    </div>
-                </div>
             </div>
-
         )
     }
-
 }
 
 export default CanvasComp;

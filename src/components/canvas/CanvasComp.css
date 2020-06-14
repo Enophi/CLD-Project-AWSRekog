@@ -1,22 +1,22 @@
+.icons-base-color{
+    color: #429ef5;
+}
+
+.icons-base-color:hover {
+    color: #0b5aa5;
+}
+
+.icons-base-color:active {
+    color: #073057;
+}
+
 .nav {
     margin: 10px;
 }
 
-.results {
-    display: flex;
-    align-items: center;
-}
-
-.item {
-    flex-grow: 1;
-    align-self: flex-start;
-}
-
-.item-2 {
-    flex-grow: 2;
-    align-self: flex-start;
-}
-
+/* AWS response presentation */
 .json {
+    overflow-y: scroll; 
+    height:600px;
     text-align: left;
 }
